@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# v0.02 2018.03.20
+# Author: Timofeev Vitaly (vitaly(DOT)tim(AT)gmail(D0T)com)
+# Licence : GPL - http://www.gnu.org/licenses/gpl.txt
+# Nagios plugin for control RGB LED bulb.
+
+led_control_host=host_name_OR_ip
+
+request="GET services
+Stats: state = 2
+Stats: state = 1
+Stats: state = 3
+Separators: 10 32 44 124
+"
+
+socket=/var/spool/nagios/live
+
+result=$( echo "$request" | unixcat $socket )
+
+critical=$( echo "$result" | awk '{print $1}')
+if [ "$critical" -ne "0" ]
+    then
+	 /usr/lib64/nagios/plugins/check_nrpe  -H $led_control_host -c lamp_critical -t 60
+	exit 0
+fi
+
+warning=$( echo "$result" | awk '{print $2}')
+if [ "$warning" -ne "0" ]
+    then
+	 /usr/lib64/nagios/plugins/check_nrpe  -H $led_control_host -c lamp_warning -t 60
+	exit 0
+fi
+
+unknown=$( echo "$result" | awk '{print $3}')
+if [ "$unknown" -ne "0" ]
+    then
+	 /usr/lib64/nagios/plugins/check_nrpe  -H $led_control_host -c lamp_unknown -t 60
+	exit 0
+fi
+
+/usr/lib64/nagios/plugins/check_nrpe  -H $led_control_host -c lamp_ok -t 60
+exit 0

@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# v0.02 2018.03.20
+# Author: Timofeev Vitaly (vitaly(DOT)tim(AT)gmail(D0T)com)
+# Licence : GPL - http://www.gnu.org/licenses/gpl.txt
+# Nagios plugin for control RGB LED bulb (off).
+
+led_control_host=host_name_OR_ip
+
+/usr/lib64/nagios/plugins/check_nrpe  -H $led_control_host -c lamp_off -t 60
